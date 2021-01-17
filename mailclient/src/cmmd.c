@@ -19,12 +19,14 @@ static int s_logind(struct mail_head * user_head,int fd)
         return -1;
     }
     printf("Username:");
-    if(!fgets(user_head->username,NAMELEN,stdin))Error("Read",-1);
+    if(!fgets(user_head->username,NAMELEN,stdin))
+    Error("Read",-1);
     
     printf("Password:");
     tty_mode(0);
     set_noecho();
-    if(!fgets(user_head->password,PSWDLEN,stdin))Error("Read",-1);
+    if(!fgets(user_head->password,PSWDLEN,stdin))
+    Error("Read",-1);
     tty_mode(1);
     
     user_head->username[strlen(user_head->username) - 1] = 0;
@@ -435,6 +437,32 @@ static int s_exited(struct mail_head * user_head,int fd)
 {
     __sys_exit("\n\rSystem exited.\n\r",fd);
 }
+static int s_helped(struct mail_head * user_head,int fd)
+{
+    printf("<Command info>\n\r");
+    printf("\tlogind\t"
+    "--login to system by your account.\n\r");
+    printf("\tregist\t"
+    "--regist an account for login.\n\r");
+    printf("\tadfrnd\t"
+    "--request to add a friend.\n\r");
+    printf("\taccept\t"
+    "--accept add frriend requests.\n\r");
+    printf("\tlistfs\t"
+    "--show list about your friends.\n\r");
+    printf("\tmailto\t"
+    "--send mails to your friends.\n\r");
+    printf("\tlistms\t"
+    "--show mails in your mailbox.\n\r");
+    printf("\trecvms\t"
+    "--receive mails from users.\n\r");
+    printf("\tsersms\t"
+    "--receive mails from server.\n\r");
+    printf("\texit\t"
+    "--exit the system.\n\r");
+    printf("\thelp\t"
+    "--show command infos.\n\r");
+}
 static int s_illegal(struct mail_head * user_head,int fd)
 {
     printf("Usage:Command [%s] is not supported now!\n\r",
@@ -443,6 +471,7 @@ static int s_illegal(struct mail_head * user_head,int fd)
     return 2;
 }
 #define EXITED "exit"
+#define HELPED "help"
 int (*login_regist(char * cmmd))(struct mail_head*,int)
 {
     cmmd[strlen(cmmd) - 1] = 0;
@@ -462,6 +491,7 @@ int (*sys_services(char * cmmd))(struct mail_head*,int)
     else if(!strcasecmp(cmmd,RECVMS))return s_recvms;
     else if(!strcasecmp(cmmd,SERSMS))return s_sersms;
     else if(!strcasecmp(cmmd,EXITED))return s_exited;
+    else if(!strcasecmp(cmmd,HELPED))return s_helped;
     else return s_illegal;
 }
 static void __sys_exit(char * mstr,int sockfd)
